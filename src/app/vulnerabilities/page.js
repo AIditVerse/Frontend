@@ -11,11 +11,11 @@ export default function Contribute() {
   useEffect(() => {
     const checkConnection = async () => {
         try {
-            await window.bitkeep.solana.connect();
-            if (!window.bitkeep.solana.isConnected) {
+            await window.aptos.connect();
+            if (!window.aptos.isConnected) {
                 window.location.href = "/";
             } else {
-                const address = window.bitkeep.solana.publicKey.toString();
+                const address = window.aptos.publicKey.toString();
                 setWalletAddress(address);
             }
         } catch (err) {
@@ -26,7 +26,7 @@ export default function Contribute() {
         }
     };
 
-    if (window.bitkeep.solana) {
+    if (window.aptos) {
         setTimeout(checkConnection, 100);
     } else {
         window.location.href = "/";
