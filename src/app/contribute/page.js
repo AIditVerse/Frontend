@@ -15,28 +15,39 @@ export default function Contribute() {
 
     useEffect(() => {
         const checkConnection = async () => {
-            try {
-                await window.aptos.connect();
-                if (!window.aptos.isConnected) {
-                    window.location.href = "/";
+          try {
+            // Check if Ethereum provider is available
+            if (typeof window.ethereum !== 'undefined') {
+              // Retrieve accounts already connected
+              const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+      
+              // Check if any accounts are returned
+              if (accounts.length > 0) {
+                console.log("Already connected to Ethereum wallet:", accounts[0]);
+                setWalletAddress(accounts[0]); // Store the wallet address if needed
+              } else {
+                // If no accounts are connected, request access
+                const newAccounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                if (newAccounts.length > 0) {
+                  console.log("Connected to Ethereum wallet:", newAccounts[0]);
+                  setWalletAddress(newAccounts[0]); // Store the wallet address
+                  // window.location.href = "/main"; 
                 } else {
-                    const address = window.aptos.publicKey.toString();
-                    setWalletAddress(address);
+                  console.error("No accounts found.");
                 }
-            } catch (err) {
-                console.error("Connection was canceled or an error occurred:", err);
-                window.location.href = "/";
-            } finally {
-                setWalletLoading(false); 
+              }
+            } else {
+              console.error("Ethereum wallet not detected. Please install MetaMask or another wallet.");
             }
+          } catch (err) {
+            console.error("Error checking connection:", err);
+          }
         };
-
-        if (window.aptos) {
-            setTimeout(checkConnection, 100);
-        } else {
-            window.location.href = "/";
-        }
-    }, []);
+      
+        // Check connection on component mount
+        checkConnection();
+      }, []);
+  
 
     const options = [
         "Reentrancy",
